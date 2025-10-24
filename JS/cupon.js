@@ -1,3 +1,5 @@
+// Cupón de descuento que se habilita cuando el usuario se suscribe al newsletter.
+// La idea del cupón era incorporar el uso de luxon y sweetalert2, aunque la estética de sweetalert2 es algo que me hubiera gustado personalizar
 (function () {
   const CUPON = 'RINASUMMER10';
   const COUNTDOWN_MINUTES = 20;
@@ -21,6 +23,7 @@
     lanzarInvitacionNewsletter();
   });
 
+   // Revisa si el cupón ya estaba guardado y sigue vigente.
   function obtenerExpiracion() {
     const valor = sessionStorage.getItem(STORAGE_KEY);
 
@@ -45,11 +48,18 @@
       focusConfirm: false,
       allowOutsideClick: false,
       allowEscapeKey: false,
+      showCancelButton: true,
+      cancelButtonText: 'Omitir',
       confirmButtonText: 'Aceptar',
       preConfirm: validarCorreo
     }).then(function (resultado) {
       if (resultado.isConfirmed) {
         mostrarCupon();
+        return;
+      }
+
+      if (resultado.dismiss === Swal.DismissReason.cancel) {
+        Swal.close();
       }
     });
   }
@@ -61,6 +71,7 @@
     );
   }
 
+// Valida que el correo ingresado tenga un formato correcto.
   function validarCorreo() {
     const input = document.getElementById('swal-input-email');
 
@@ -85,6 +96,7 @@
     return correo;
   }
 
+  // Muestra el cupón obtenido y da paso a la cuenta regresiva.
   function mostrarCupon() {
     Swal.fire({
       title: '¡Gracias por sumarte!',
@@ -103,6 +115,7 @@
     });
   }
 
+// Genera y guarda la expiración del cupón e inicia el seguimiento con un mensaje en la esquina superior derecha.
   function iniciarCuentaRegresiva() {
     const expiracion = luxon.DateTime.now().plus({ minutes: COUNTDOWN_MINUTES });
     sessionStorage.setItem(STORAGE_KEY, expiracion.toISO());
@@ -156,6 +169,8 @@
 
     return panel;
   }
+
+// Programa la actualización de la cuenta regresiva cada segundo y se configura para detenerse al expirar el cupón.
 
   function iniciarActualizacion(expiracion) {
     detenerActualizacion();

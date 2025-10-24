@@ -1,3 +1,4 @@
+// Elementos del DOM que usa el carrito en la página.
 const listaCarrito = document.getElementById('carrito-lista');
 const mensajeVacio = document.getElementById('carrito-vacio');
 const totalElemento = document.getElementById('carrito-total');
@@ -17,6 +18,8 @@ const mensajeConfirmacion = document.getElementById('carrito-confirmacion');
 const carritoSeccion = document.getElementById('seccion-carrito');
 const carritoBurbuja = document.querySelector('.carrito-burbuja');
 const botonCerrarConfirmacion = document.getElementById('carrito-confirmacion-cerrar');
+
+// Claves para guardar la compra y el cupón
 const STORAGE_KEY = 'rinaaccs_carrito';
 const CUPON_CODIGO = 'RINASUMMER10';
 const CUPON_STORAGE_KEY = 'rinaaccs_cupon_expiracion';
@@ -24,6 +27,7 @@ let carrito = [];
 let catalogo = {};
 let cuponActivo = false;
 
+// Muestra un mensaje toast para confirmar acciones del carrito.
 function mostrarToastCarrito(mensaje, tipo = 'agregado') {
   if (typeof Toastify !== 'function') {
     return;
@@ -58,6 +62,7 @@ function mostrarToastCarrito(mensaje, tipo = 'agregado') {
   }).showToast();
 }
 
+// Configura el carrito solo cuando los elementos existen.
 if (listaCarrito && mensajeVacio && totalElemento && botonComprar) {
   suscribirseACatalogo();
   carrito = cargarCarrito();
@@ -84,7 +89,7 @@ function suscribirseACatalogo() {
   });
 }
 
-
+// Conecta la burbuja flotante con la sección del carrito.
 function prepararBotonBurbuja() {
   if (!carritoBurbuja || !carritoSeccion) {
     return;
@@ -95,6 +100,7 @@ function prepararBotonBurbuja() {
   });
 }
 
+// Activa el flujo de compra y el formulario de checkout.
 function prepararEventosDeCompra() {
   botonComprar.addEventListener('click', function () {
     if (!checkoutSeccion || carrito.length === 0) {
@@ -103,7 +109,7 @@ function prepararEventosDeCompra() {
 
     checkoutSeccion.hidden = false;
 
-   ocultarModalConfirmacion();
+    ocultarModalConfirmacion();
 
     actualizarTotales();
 
@@ -130,6 +136,7 @@ function prepararEventosDeCompra() {
   }
 }
 
+// Habilita los eventos necesarios para aplicar un cupón manualmente.
 function prepararCupon() {
   if (!cuponInput || !cuponBoton) {
     return;
@@ -145,6 +152,7 @@ function prepararCupon() {
   });
 }
 
+// Valida el código ingresado y activa el descuento si corresponde.
 function aplicarCupon() {
   if (!cuponInput) {
     return;
@@ -171,6 +179,7 @@ function aplicarCupon() {
   actualizarTotales();
 }
 
+// Informa al usuario si el cupón fue aceptado o rechazado.
 function mostrarMensajeCupon(texto, tipo) {
   if (!cuponMensaje) {
     return;
@@ -187,6 +196,7 @@ function mostrarMensajeCupon(texto, tipo) {
   }
 }
 
+// Oculta cualquier mensaje previo relacionado al cupón.
 function ocultarMensajeCupon() {
   if (!cuponMensaje) {
     return;
@@ -197,6 +207,7 @@ function ocultarMensajeCupon() {
   cuponMensaje.classList.remove('carrito__cupon-mensaje--error', 'carrito__cupon-mensaje--exito');
 }
 
+// Actualiza la sección del resumen con el descuento del cupón.
 function actualizarVisualizacionCupon(descuento) {
   if (!cuponDescuentoElemento || !cuponDescuentoValor) {
     return;
@@ -211,6 +222,7 @@ function actualizarVisualizacionCupon(descuento) {
   }
 }
 
+// Calcula el monto a descontar según el cupón vigente.
 function calcularDescuentoCupon(totalActual) {
   if (!cuponActivo) {
     return 0;
@@ -229,6 +241,7 @@ function calcularDescuentoCupon(totalActual) {
   return totalActual * 0.1;
 }
 
+// Confirma que el cupón todavía no expiró en la sesión.
 function estaCuponVigente() {
   if (typeof luxon === 'undefined' || typeof sessionStorage === 'undefined') {
     return false;
@@ -237,6 +250,7 @@ function estaCuponVigente() {
   return obtenerExpiracionCupon() !== null;
 }
 
+// Obtiene y valida la fecha límite almacenada para el cupón.
 function obtenerExpiracionCupon() {
   const valor = sessionStorage.getItem(CUPON_STORAGE_KEY);
 
@@ -266,6 +280,7 @@ function obtenerExpiracionCupon() {
   return fecha;
 }
 
+// Configura el modal que agradece la compra y permite cerrarlo.
 function prepararModalConfirmacion() {
   if (!mensajeConfirmacion) {
     return;
@@ -284,18 +299,20 @@ function prepararModalConfirmacion() {
   document.addEventListener('keydown', manejarEscapeConfirmacion);
 }
 
+// Cierra el mensaje de confirmación al presionar Escape.
 function manejarEscapeConfirmacion(evento) {
   if (evento.key === 'Escape' && mensajeConfirmacion && !mensajeConfirmacion.hidden) {
     ocultarModalConfirmacion();
   }
 }
 
+// Mensaje emergente después de apretar finalizar compra.
 function mostrarModalConfirmacion() {
   if (!mensajeConfirmacion) {
     return;
   }
 
-   if (checkoutSeccion) {
+  if (checkoutSeccion) {
     checkoutSeccion.hidden = false;
   }
 
@@ -307,6 +324,7 @@ function mostrarModalConfirmacion() {
   }
 }
 
+// Oculta el modal y restablece el estado de la página.
 function ocultarModalConfirmacion() {
   if (!mensajeConfirmacion) {
     return;
@@ -320,8 +338,8 @@ function ocultarModalConfirmacion() {
   }
 }
 
-
-  function cargarCarrito() {
+// Recupera el carrito guardado en localStorage
+function cargarCarrito() {
   const datosGuardados = localStorage.getItem(STORAGE_KEY);
 
   if (!datosGuardados) {
@@ -340,10 +358,12 @@ function ocultarModalConfirmacion() {
   return [];
 }
 
+// Almacena el contenido del carrito en localStorage.
 function guardarCarrito() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(carrito));
 }
 
+// Limpia el carrito
 function vaciarCarrito() {
   carrito = [];
   guardarCarrito();
@@ -353,6 +373,7 @@ function vaciarCarrito() {
   renderizarCarrito();
 }
 
+// Suma una unidad del producto indicado y muestra el mensaje de toast.
 function agregarProductoAlCarrito(idProducto) {
   const producto = catalogo[idProducto];
 
@@ -378,6 +399,7 @@ function agregarProductoAlCarrito(idProducto) {
   mostrarToastCarrito(producto.nombre + ' agregado al carrito', 'agregado');
 }
 
+// Quita una unidad, no todos los productos de una y avisa al usuario
 function eliminarProductoDelCarrito(idProducto) {
   const producto = catalogo[idProducto];
   let seElimino = false;
@@ -419,6 +441,7 @@ function eliminarProductoDelCarrito(idProducto) {
   }
 }
 
+// Suma el precio total sin descuentos.
 function calcularTotal() {
   let total = 0;
 
@@ -436,6 +459,7 @@ function calcularTotal() {
   return total;
 }
 
+// Calculo de descuentos y actualización del total
 function actualizarTotales() {
   const total = calcularTotal();
   totalElemento.textContent = total;
@@ -455,7 +479,7 @@ function actualizarTotales() {
 
   let descuentoTransferencia = 0;
 
- if (medioPagoSelect && medioPagoSelect.value === 'transferencia') {
+  if (medioPagoSelect && medioPagoSelect.value === 'transferencia') {
     descuentoTransferencia = totalConDescuento * 0.15;
   }
 
@@ -480,6 +504,7 @@ function actualizarTotales() {
   totalResumen.textContent = totalConDescuento.toFixed(2);
 }
 
+// Actualiza el carrito
 function renderizarCarrito() {
   listaCarrito.innerHTML = '';
 

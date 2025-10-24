@@ -1,19 +1,24 @@
+// El array que estaba acá ahora está en fomato json, en el archivo catalogo.json
 const listaPulseras = document.getElementById("pulseras");
 const listaCollares = document.getElementById("collares");
+
 const inventarioProductos = [];
 
+// Catalogo remoto de productos.
 const URL_CATALOGO = "../json/catalogo.json";
-const RETARDO_CARGA = 300;
+const RETARDO_CARGA = 300; // Simula retardo de red en ms, que se inicializa más abajo.
 
+// Card reutilizable que se abre cuando se pide más información.
 const cardProducto = crearCardProducto();
 
+// Se inicia la carga del catálogo.
 inicializarProductos();
-
 function inicializarProductos() {
   if (!listaPulseras || !listaCollares) {
     return;
   }
 
+  // Simula retardo y luego trae y publica los productos.
   setTimeout(() => {
     cargarCatalogo()
       .then((catalogo) => {
@@ -27,6 +32,7 @@ function inicializarProductos() {
   }, RETARDO_CARGA);
 }
 
+// Descarga el archivo JSON del catálogo y lo valida.
 async function cargarCatalogo() {
   const respuesta = await fetch(URL_CATALOGO, { cache: "no-cache" });
 
@@ -38,6 +44,7 @@ async function cargarCatalogo() {
   return normalizarCatalogo(datos);
 }
 
+// Asegura que el objeto de productos siempre tenga los arreglos esperados.
 function normalizarCatalogo(datos) {
   const resultado = {
     pulseras: Array.isArray(datos?.pulseras) ? datos.pulseras : [],
@@ -47,6 +54,7 @@ function normalizarCatalogo(datos) {
   return resultado;
 }
 
+// Limpia las listas y crea las tarjetas visibles para cada producto.
 function poblarCatalogo(catalogo) {
   limpiarLista(listaPulseras);
   limpiarLista(listaCollares);
@@ -61,12 +69,14 @@ function poblarCatalogo(catalogo) {
   }
 }
 
+// Quita los elementos previos de la lista.
 function limpiarLista(lista) {
   if (lista) {
     lista.innerHTML = "";
   }
 }
 
+// Arma un índice por id de los productos.
 function compartirCatalogoConCarrito(catalogo) {
   const mapa = {};
 
@@ -89,6 +99,7 @@ function compartirCatalogoConCarrito(catalogo) {
   document.dispatchEvent(evento);
 }
 
+// Muestra una alerta visual si la carga falla.
 function mostrarMensajeDeError() {
   const mensaje = document.createElement("li");
   mensaje.className = "producto__mensaje-error";
@@ -158,6 +169,7 @@ function crearCardProducto() {
     overlay.classList.remove("is-active");
   });
 
+ // Cierra el contenido si se hace clic fuera del contenido.
   overlay.addEventListener("click", function (evento) {
     if (evento.target === overlay) {
       overlay.classList.remove("is-active");
@@ -176,6 +188,7 @@ function crearCardProducto() {
   };
 }
 
+// Completa y muestra el modal o la tarjeta con la información extendida.
 function mostrarCardProducto(producto) {
   cardProducto.imagen.src = producto.imagen;
   cardProducto.imagen.alt = producto.nombre + " ampliado";
@@ -191,6 +204,7 @@ function mostrarCardProducto(producto) {
   cardProducto.overlay.classList.add("is-active");
 }
 
+// Construye cada item del catálogo con imagen, datos y acciones.
 function crearTarjetaProducto(producto, listaDestino) {
   if (!listaDestino) {
     return;
