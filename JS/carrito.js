@@ -176,19 +176,40 @@ function agregarProductoAlCarrito(idProducto) {
 
 function eliminarProductoDelCarrito(idProducto) {
   const producto = catalogo[idProducto];
-  const nuevaLista = [];
+  let seElimino = false;
+  let quedanUnidades = false;
 
   for (let i = 0; i < carrito.length; i++) {
     if (carrito[i].id !== idProducto) {
-      nuevaLista.push(carrito[i]);
+      continue;
     }
+
+    if (carrito[i].cantidad > 1) {
+      carrito[i].cantidad = carrito[i].cantidad - 1;
+      quedanUnidades = true;
+    } else {
+      carrito.splice(i, 1);
+    }
+
+    seElimino = true;
+    break;
   }
 
-  carrito = nuevaLista;
+  if (!seElimino) {
+    return;
+  }
+
   guardarCarrito();
   renderizarCarrito();
+
   if (producto && producto.nombre) {
-    mostrarToastCarrito(producto.nombre + ' eliminado del carrito', 'eliminado');
+    if (quedanUnidades) {
+      mostrarToastCarrito('Una unidad de ' + producto.nombre + ' eliminada del carrito', 'eliminado');
+    } else {
+      mostrarToastCarrito(producto.nombre + ' eliminado del carrito', 'eliminado');
+    }
+  } else if (quedanUnidades) {
+    mostrarToastCarrito('Una unidad del producto eliminada del carrito', 'eliminado');
   } else {
     mostrarToastCarrito('Producto eliminado del carrito', 'eliminado');
   }
