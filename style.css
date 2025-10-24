@@ -926,15 +926,66 @@ footer a:hover {
   transform: scale(1.05);
 }
 
-.carrito__confirmacion {
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: #b8928b;
+body.carrito__modal-activo {
+  overflow: hidden;
+}
+
+.carrito__modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: rgba(23, 17, 16, 0.55);
+  z-index: 2000;
+  animation: fadeIn 0.3s ease both;
+}
+
+.carrito__modal[hidden] {
+  display: none;
+}
+
+.carrito__modal-contenido {
+  background: linear-gradient(145deg, #fdf9f8, #f3e7e4);
+  color: #6f4f4b;
+  border-radius: 18px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
   text-align: center;
-  background-color: rgba(184, 146, 139, 0.12);
-  padding: 1rem;
-  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.carrito__modal-mensaje {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.carrito__modal-cerrar {
+  align-self: center;
+  padding: 0.65rem 1.8rem;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #b8928b, #d0bab4);
+  color: #f8f3f2;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 10px 25px rgba(184, 146, 139, 0.35);
+}
+
+.carrito__modal-cerrar:hover,
+.carrito__modal-cerrar:focus {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 14px 32px rgba(184, 146, 139, 0.4);
+  outline: none;
 }
 
 @media (max-width: 900px) {

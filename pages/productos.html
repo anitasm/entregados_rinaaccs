@@ -102,9 +102,16 @@
                 <p class="carrito__total-resumen">Total a pagar: $<span id="carrito-total-resumen">0</span></p>
                 <button type="submit" id="carrito-finalizar" class="carrito__finalizar">Finalizar compra</button>
             </form>
-            <p id="carrito-confirmacion" class="carrito__confirmacion" hidden>
-                Nos estaremos comunicando a su número de teléfono para seguir coordinando el pago y envío :) Muchas gracias por confiar en nosotros!!
-            </p>
+            <div id="carrito-confirmacion" class="carrito__modal" role="dialog" aria-modal="true" hidden>
+                <div class="carrito__modal-contenido" role="document">
+                    <p class="carrito__modal-mensaje">
+                        Nos estaremos comunicando con usted para coordinar el pago y el envío!! Muchas gracias por confiar en nosotros! Atentamente, el equipo de Rina Coledani
+                    </p>
+                    <button type="button" id="carrito-confirmacion-cerrar" class="carrito__modal-cerrar" aria-label="Cerrar mensaje de confirmación">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
 

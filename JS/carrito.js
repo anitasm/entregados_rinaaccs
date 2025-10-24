@@ -11,6 +11,7 @@ const descuentoValor = document.getElementById('carrito-descuento-valor');
 const mensajeConfirmacion = document.getElementById('carrito-confirmacion');
 const carritoSeccion = document.getElementById('seccion-carrito');
 const carritoBurbuja = document.querySelector('.carrito-burbuja');
+const botonCerrarConfirmacion = document.getElementById('carrito-confirmacion-cerrar');
 const STORAGE_KEY = 'rinaaccs_carrito';
 let carrito = [];
 let catalogo = {};
@@ -55,6 +56,7 @@ if (listaCarrito && mensajeVacio && totalElemento && botonComprar) {
 
   renderizarCarrito();
   prepararBotonBurbuja();
+  prepararModalConfirmacion();
   prepararEventosDeCompra();
 }
 
@@ -92,9 +94,7 @@ function prepararEventosDeCompra() {
 
     checkoutSeccion.hidden = false;
 
-    if (mensajeConfirmacion) {
-      mensajeConfirmacion.hidden = true;
-    }
+   ocultarModalConfirmacion();
 
     actualizarTotales();
 
@@ -115,13 +115,56 @@ function prepararEventosDeCompra() {
         return;
       }
 
-       vaciarCarrito();
-
-      if (mensajeConfirmacion) {
-        mensajeConfirmacion.hidden = false;
-      }
+      vaciarCarrito();
+      mostrarModalConfirmacion();
     });
   }
+}
+
+function prepararModalConfirmacion() {
+  if (!mensajeConfirmacion) {
+    return;
+  }
+
+  mensajeConfirmacion.addEventListener('click', function (evento) {
+    if (evento.target === mensajeConfirmacion) {
+      ocultarModalConfirmacion();
+    }
+  });
+
+  if (botonCerrarConfirmacion) {
+    botonCerrarConfirmacion.addEventListener('click', ocultarModalConfirmacion);
+  }
+
+  document.addEventListener('keydown', manejarEscapeConfirmacion);
+}
+
+function manejarEscapeConfirmacion(evento) {
+  if (evento.key === 'Escape' && mensajeConfirmacion && !mensajeConfirmacion.hidden) {
+    ocultarModalConfirmacion();
+  }
+}
+
+function mostrarModalConfirmacion() {
+  if (!mensajeConfirmacion) {
+    return;
+  }
+
+  mensajeConfirmacion.hidden = false;
+  document.body.classList.add('carrito__modal-activo');
+
+  if (botonCerrarConfirmacion) {
+    botonCerrarConfirmacion.focus();
+  }
+}
+
+function ocultarModalConfirmacion() {
+  if (!mensajeConfirmacion) {
+    return;
+  }
+
+  mensajeConfirmacion.hidden = true;
+  document.body.classList.remove('carrito__modal-activo');
 }
 
 
