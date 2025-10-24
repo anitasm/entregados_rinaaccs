@@ -150,6 +150,10 @@ function mostrarModalConfirmacion() {
     return;
   }
 
+   if (checkoutSeccion) {
+    checkoutSeccion.hidden = false;
+  }
+
   mensajeConfirmacion.hidden = false;
   document.body.classList.add('carrito__modal-activo');
 
@@ -165,10 +169,14 @@ function ocultarModalConfirmacion() {
 
   mensajeConfirmacion.hidden = true;
   document.body.classList.remove('carrito__modal-activo');
+
+  if (checkoutSeccion && carrito.length === 0) {
+    checkoutSeccion.hidden = true;
+  }
 }
 
 
-function cargarCarrito() {
+  function cargarCarrito() {
   const datosGuardados = localStorage.getItem(STORAGE_KEY);
 
   if (!datosGuardados) {
