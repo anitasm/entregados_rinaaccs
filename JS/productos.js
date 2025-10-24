@@ -78,7 +78,7 @@ function compartirCatalogoConCarrito(catalogo) {
     mapa[catalogo.collares[j].id] = catalogo.collares[j];
   }
 
-  window.catalogoDatos = mapa;
+  let catalogoDatos = mapa;
 
   const evento = new CustomEvent("catalogoCargado", {
     detail: {

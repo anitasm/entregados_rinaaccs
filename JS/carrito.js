@@ -25,8 +25,8 @@ if (listaCarrito && mensajeVacio && totalElemento && botonComprar) {
 }
 
 function suscribirseACatalogo() {
-  if (typeof window.catalogoDatos === 'object' && window.catalogoDatos !== null) {
-    catalogo = window.catalogoDatos;
+  if (typeof catalogoDatos === 'object' && catalogoDatos !== null) {
+    catalogo = catalogoDatos;
   }
 
   document.addEventListener('catalogoCargado', function (evento) {
