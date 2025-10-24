@@ -1081,4 +1081,65 @@ body.carrito__modal-activo {
   }
 }
 
-/*# sourceMappingURL=style.css.map */
+.cupon-countdown {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 2000;
+  background: rgba(184, 146, 139, 0.95);
+  color: #fdf9f7;
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  min-width: 220px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  backdrop-filter: blur(4px);
+}
+
+.cupon-countdown__titulo {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.cupon-countdown__cupon {
+  font-weight: 700;
+}
+
+.cupon-countdown__tiempo {
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+}
+
+.cupon-countdown__timer {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.cupon-countdown--finalizado {
+  background: rgba(80, 80, 80, 0.9);
+}
+
+.cupon-countdown__mensaje-final {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+}
+
+.swal2-cupon {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.swal2-cupon__detalle {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .cupon-countdown {
+    top: auto;
+    right: 1rem;
+    left: 1rem;
+    bottom: 1rem;
+  }
+}
