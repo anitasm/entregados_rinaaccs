@@ -8,13 +8,21 @@ const medioPagoSelect = document.getElementById('medio-pago');
 const totalResumen = document.getElementById('carrito-total-resumen');
 const descuentoElemento = document.getElementById('carrito-descuento');
 const descuentoValor = document.getElementById('carrito-descuento-valor');
+const cuponDescuentoElemento = document.getElementById('carrito-cupon-descuento');
+const cuponDescuentoValor = document.getElementById('carrito-cupon-descuento-valor');
+const cuponInput = document.getElementById('carrito-cupon');
+const cuponBoton = document.getElementById('carrito-cupon-aplicar');
+const cuponMensaje = document.getElementById('carrito-cupon-mensaje');
 const mensajeConfirmacion = document.getElementById('carrito-confirmacion');
 const carritoSeccion = document.getElementById('seccion-carrito');
 const carritoBurbuja = document.querySelector('.carrito-burbuja');
 const botonCerrarConfirmacion = document.getElementById('carrito-confirmacion-cerrar');
 const STORAGE_KEY = 'rinaaccs_carrito';
+const CUPON_CODIGO = 'RINASUMMER10';
+const CUPON_STORAGE_KEY = 'rinaaccs_cupon_expiracion';
 let carrito = [];
 let catalogo = {};
+let cuponActivo = false;
 
 function mostrarToastCarrito(mensaje, tipo = 'agregado') {
   if (typeof Toastify !== 'function') {
@@ -58,6 +66,7 @@ if (listaCarrito && mensajeVacio && totalElemento && botonComprar) {
   prepararBotonBurbuja();
   prepararModalConfirmacion();
   prepararEventosDeCompra();
+  prepararCupon();
 }
 
 function suscribirseACatalogo() {
@@ -119,6 +128,142 @@ function prepararEventosDeCompra() {
       mostrarModalConfirmacion();
     });
   }
+}
+
+function prepararCupon() {
+  if (!cuponInput || !cuponBoton) {
+    return;
+  }
+
+  cuponBoton.addEventListener('click', aplicarCupon);
+
+  cuponInput.addEventListener('keydown', function (evento) {
+    if (evento.key === 'Enter') {
+      evento.preventDefault();
+      aplicarCupon();
+    }
+  });
+}
+
+function aplicarCupon() {
+  if (!cuponInput) {
+    return;
+  }
+
+  const codigo = cuponInput.value.trim();
+
+  if (!estaCuponVigente()) {
+    cuponActivo = false;
+    mostrarMensajeCupon('cupón expirado', 'error');
+    actualizarTotales();
+    return;
+  }
+
+  if (codigo.toUpperCase() !== CUPON_CODIGO) {
+    cuponActivo = false;
+    mostrarMensajeCupon('cupón no válido', 'error');
+    actualizarTotales();
+    return;
+  }
+
+  cuponActivo = true;
+  mostrarMensajeCupon('Cupón aplicado: 10% de descuento.', 'exito');
+  actualizarTotales();
+}
+
+function mostrarMensajeCupon(texto, tipo) {
+  if (!cuponMensaje) {
+    return;
+  }
+
+  cuponMensaje.textContent = texto;
+  cuponMensaje.hidden = false;
+  cuponMensaje.classList.remove('carrito__cupon-mensaje--error', 'carrito__cupon-mensaje--exito');
+
+  if (tipo === 'error') {
+    cuponMensaje.classList.add('carrito__cupon-mensaje--error');
+  } else if (tipo === 'exito') {
+    cuponMensaje.classList.add('carrito__cupon-mensaje--exito');
+  }
+}
+
+function ocultarMensajeCupon() {
+  if (!cuponMensaje) {
+    return;
+  }
+
+  cuponMensaje.hidden = true;
+  cuponMensaje.textContent = '';
+  cuponMensaje.classList.remove('carrito__cupon-mensaje--error', 'carrito__cupon-mensaje--exito');
+}
+
+function actualizarVisualizacionCupon(descuento) {
+  if (!cuponDescuentoElemento || !cuponDescuentoValor) {
+    return;
+  }
+
+  if (descuento > 0) {
+    cuponDescuentoElemento.hidden = false;
+    cuponDescuentoValor.textContent = descuento.toFixed(2);
+  } else {
+    cuponDescuentoElemento.hidden = true;
+    cuponDescuentoValor.textContent = '0';
+  }
+}
+
+function calcularDescuentoCupon(totalActual) {
+  if (!cuponActivo) {
+    return 0;
+  }
+
+  if (!estaCuponVigente()) {
+    cuponActivo = false;
+    mostrarMensajeCupon('cupón expirado', 'error');
+    return 0;
+  }
+
+  if (totalActual <= 0) {
+    return 0;
+  }
+
+  return totalActual * 0.1;
+}
+
+function estaCuponVigente() {
+  if (typeof luxon === 'undefined' || typeof sessionStorage === 'undefined') {
+    return false;
+  }
+
+  return obtenerExpiracionCupon() !== null;
+}
+
+function obtenerExpiracionCupon() {
+  const valor = sessionStorage.getItem(CUPON_STORAGE_KEY);
+
+  if (!valor) {
+    return null;
+  }
+
+  let fecha = null;
+
+  try {
+    fecha = luxon.DateTime.fromISO(valor);
+  } catch (error) {
+    sessionStorage.removeItem(CUPON_STORAGE_KEY);
+    return null;
+  }
+
+  if (!fecha || !fecha.isValid) {
+    sessionStorage.removeItem(CUPON_STORAGE_KEY);
+    return null;
+  }
+
+  if (fecha <= luxon.DateTime.now()) {
+    sessionStorage.removeItem(CUPON_STORAGE_KEY);
+    return null;
+  }
+
+  return fecha;
 }
 
 function prepararModalConfirmacion() {
@@ -202,6 +347,9 @@ function guardarCarrito() {
 function vaciarCarrito() {
   carrito = [];
   guardarCarrito();
+  cuponActivo = false;
+  actualizarVisualizacionCupon(0);
+  ocultarMensajeCupon();
   renderizarCarrito();
 }
 
@@ -296,30 +444,37 @@ function actualizarTotales() {
     return;
   }
 
-  let descuento = 0;
+  let totalConDescuento = total;
 
-  if (medioPagoSelect && medioPagoSelect.value === 'transferencia') {
-    descuento = total * 0.15;
+  const descuentoCupon = calcularDescuentoCupon(totalConDescuento);
+  actualizarVisualizacionCupon(descuentoCupon);
+
+  if (descuentoCupon > 0) {
+    totalConDescuento = totalConDescuento - descuentoCupon;
+  }
+
+  let descuentoTransferencia = 0;
+
+ if (medioPagoSelect && medioPagoSelect.value === 'transferencia') {
+    descuentoTransferencia = totalConDescuento * 0.15;
   }
 
   if (descuentoElemento && descuentoValor) {
-    if (descuento > 0) {
+    if (descuentoTransferencia > 0) {
       descuentoElemento.hidden = false;
-      descuentoValor.textContent = descuento.toFixed(2);
+      descuentoValor.textContent = descuentoTransferencia.toFixed(2);
     } else {
       descuentoElemento.hidden = true;
       descuentoValor.textContent = '0';
     }
   }
 
-  let totalConDescuento = total;
+  if (descuentoTransferencia > 0) {
+    totalConDescuento = totalConDescuento - descuentoTransferencia;
+  }
 
-  if (descuento > 0) {
-    totalConDescuento = total - descuento;
-
-    if (totalConDescuento < 0) {
-      totalConDescuento = 0;
-    }
+  if (totalConDescuento < 0) {
+    totalConDescuento = 0;
   }
 
   totalResumen.textContent = totalConDescuento.toFixed(2);

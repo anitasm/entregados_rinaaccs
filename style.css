@@ -797,6 +797,71 @@ footer a:hover {
   margin-top: auto;
 }
 
+.carrito__cupon {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.carrito__cupon-label {
+  font-weight: 600;
+  color: #b8928b;
+}
+
+.carrito__cupon-controles {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.carrito__cupon-controles input {
+  flex: 1 1 auto;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(184, 146, 139, 0.3);
+  background-color: #d0bab4;
+  color: #f8f3f2;
+}
+
+.carrito__cupon-controles input:focus {
+  outline: none;
+  border-color: #b8928b;
+  box-shadow: 0 0 0 3px rgba(184, 146, 139, 0.2);
+}
+
+.carrito__cupon-boton {
+  background-color: #b8928b;
+  color: #f8f3f2;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s, transform 0.3s;
+}
+
+.carrito__cupon-boton:hover,
+.carrito__cupon-boton:focus {
+  background-color: #f8f3f2;
+  color: #b8928b;
+  transform: scale(1.03);
+  outline: none;
+}
+
+.carrito__cupon-mensaje {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #b8928b;
+}
+
+.carrito__cupon-mensaje--error {
+  color: #c77c78;
+}
+
+.carrito__cupon-mensaje--exito {
+  color: #c77c78;
+}
+
 .carrito__total {
   margin: 0;
   font-weight: 600;

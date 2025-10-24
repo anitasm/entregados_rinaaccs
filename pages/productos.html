@@ -64,6 +64,14 @@
             <ul id="carrito-lista" class="carrito__lista" aria-live="polite"></ul>
         </div>
         <div class="carrito__acciones">
+            <div class="carrito__cupon">
+                <label for="carrito-cupon" class="carrito__cupon-label">Cupón</label>
+                <div class="carrito__cupon-controles">
+                    <input type="text" id="carrito-cupon" name="carrito-cupon" placeholder="Ingresá tu cupón" aria-describedby="carrito-cupon-mensaje">
+                    <button type="button" id="carrito-cupon-aplicar" class="carrito__cupon-boton">Aplicar</button>
+                </div>
+                <p id="carrito-cupon-mensaje" class="carrito__cupon-mensaje" role="status" aria-live="polite" hidden></p>
+            </div>
             <p class="carrito__total">Total: $<span id="carrito-total">0</span></p>
             <button type="button" class="carrito__comprar">Continuar con la compra</button>
         </div>
@@ -99,6 +107,9 @@
                 </div>
                 <p id="carrito-descuento" class="carrito__descuento" hidden>
                     Descuento por transferencia: -$<span id="carrito-descuento-valor">0</span>
+                </p>
+                <p id="carrito-cupon-descuento" class="carrito__descuento" hidden>
+                    Descuento por cupón: -$<span id="carrito-cupon-descuento-valor">0</span>
                 </p>
                 <p class="carrito__total-resumen">Total a pagar: $<span id="carrito-total-resumen">0</span></p>
                 <button type="submit" id="carrito-finalizar" class="carrito__finalizar">Finalizar compra</button>
