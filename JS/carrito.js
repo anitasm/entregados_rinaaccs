@@ -115,12 +115,11 @@ function prepararEventosDeCompra() {
         return;
       }
 
+       vaciarCarrito();
+
       if (mensajeConfirmacion) {
         mensajeConfirmacion.hidden = false;
       }
-
-      checkoutForm.reset();
-      actualizarTotales();
     });
   }
 }
@@ -147,6 +146,12 @@ function cargarCarrito() {
 
 function guardarCarrito() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(carrito));
+}
+
+function vaciarCarrito() {
+  carrito = [];
+  guardarCarrito();
+  renderizarCarrito();
 }
 
 function agregarProductoAlCarrito(idProducto) {
