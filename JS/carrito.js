@@ -16,13 +16,29 @@ let carrito = [];
 let catalogo = {};
 
 if (listaCarrito && mensajeVacio && totalElemento && botonComprar) {
-  catalogo = crearCatalogo();
+  suscribirseACatalogo();
   carrito = cargarCarrito();
 
   renderizarCarrito();
   prepararBotonBurbuja();
   prepararEventosDeCompra();
 }
+
+function suscribirseACatalogo() {
+  if (typeof window.catalogoDatos === 'object' && window.catalogoDatos !== null) {
+    catalogo = window.catalogoDatos;
+  }
+
+  document.addEventListener('catalogoCargado', function (evento) {
+    const productos = evento?.detail?.productos;
+
+    if (productos && typeof productos === 'object') {
+      catalogo = productos;
+      renderizarCarrito();
+    }
+  });
+}
+
 
 function prepararBotonBurbuja() {
   if (!carritoBurbuja || !carritoSeccion) {
@@ -75,23 +91,6 @@ function prepararEventosDeCompra() {
   }
 }
 
-function crearCatalogo() {
-  const resultado = {};
-
-  if (typeof datosPulseras !== 'undefined') {
-    for (let i = 0; i < datosPulseras.length; i++) {
-      resultado[datosPulseras[i].id] = datosPulseras[i];
-    }
-  }
-
-  if (typeof datosCollares !== 'undefined') {
-    for (let j = 0; j < datosCollares.length; j++) {
-      resultado[datosCollares[j].id] = datosCollares[j];
-    }
-  }
-
-  return resultado;
-}
 
 function cargarCarrito() {
   const datosGuardados = localStorage.getItem(STORAGE_KEY);

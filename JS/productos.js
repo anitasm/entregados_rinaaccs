@@ -1,105 +1,107 @@
 const listaPulseras = document.getElementById("pulseras");
 const listaCollares = document.getElementById("collares");
-
-const datosPulseras = [
-  {
-    id: "pulsera_triple-cristalrosa",
-    nombre: "Cristal Rosa Triple",
-    precio: 5500,
-    descripcionCorta: "Pulsera con cristales rosa en triple vuelta.",
-    descripcionDetallada:
-      "Tres hebras de cristales rosados cuidadosamente engarzados para envolver la muñeca con brillo y suavidad.",
-    imagen: "../assets/imagen-dos.jpeg"
-  },
-  {
-    id: "pulsera_cadena-cristal",
-    nombre: "Cadena y Cristal",
-    precio: 7800,
-    descripcionCorta: "Pulsera combinada con cadena y cristal central.",
-    descripcionDetallada:
-      "Diseño mixto con cadena metálica pulida y un cristal central facetado que aporta luz a cualquier look diario.",
-    imagen: "../assets/imagen-tres.jpeg"
-  },
-  {
-    id: "pulsera_doble-blancoybronce",
-    nombre: "Blanco y Bronce Doble",
-    precio: 5000,
-    descripcionCorta: "Doble vuelta en tonos blanco y bronce.",
-    descripcionDetallada:
-      "Dos vueltas combinadas en cuentas blancas nacaradas y destellos bronce para un contraste delicado.",
-    imagen: "../assets/imagen-cuatro.jpeg"
-  },
-  {
-    id: "pulsera_simple-ojoturco",
-    nombre: "Ojo Turco Simple",
-    precio: 6300,
-    descripcionCorta: "Pulsera protectora con dije de ojo turco.",
-    descripcionDetallada:
-      "Cordón de cuentas translúcidas con dije de ojo turco esmaltado, ideal como amuleto de protección.",
-    imagen: "../assets/imagen-cinco.jpeg"
-  },
-  {
-    id: "pulsera_piedra-natural",
-    nombre: "Piedra Natural",
-    precio: 9700,
-    descripcionCorta: "Pulsera de piedras naturales seleccionadas.",
-    descripcionDetallada:
-      "Selección artesanal de piedras naturales pulidas que aportan textura y energía equilibrante.",
-    imagen: "../assets/imagen-seis.jpeg"
-  },
-  {
-    id: "pulsera_piedra-combinada",
-    nombre: "Piedra Combinada",
-    precio: 9500,
-    descripcionCorta: "Combinación de piedras naturales y cristales.",
-    descripcionDetallada:
-      "Mezcla armónica de cristales y piedras minerales en tonos tierra para complementar cualquier estilo.",
-    imagen: "../assets/imagen-ocho.jpeg"
-  }
-];
-
-const datosCollares = [
-  {
-    id: "collar_rojo",
-    nombre: "Collar Rojo",
-    precio: 7200,
-    descripcionCorta: "Collar con cuentas rojizas y dije central.",
-    descripcionDetallada:
-      "Cadena de cuentas rojizas con un dije central metálico que resalta el escote con calidez.",
-    imagen: "../assets/collaruno.jpg"
-  },
-  {
-    id: "collar_blanco",
-    nombre: "Collar Blanco",
-    precio: 6900,
-    descripcionCorta: "Diseño en tonos blancos y detalles metálicos.",
-    descripcionDetallada:
-      "Perlas sintéticas blancas combinadas con detalles metálicos dorados para un acabado luminoso.",
-    imagen: "../assets/collardos.jpg"
-  },
-  {
-    id: "collar_doblegancho",
-    nombre: "Collar Doble Gancho",
-    precio: 7600,
-    descripcionCorta: "Doble capa con cierre regulable y dijes.",
-    descripcionDetallada:
-      "Dos capas superpuestas con dijes móviles y gancho regulable que permite ajustar el largo a gusto.",
-    imagen: "../assets/collartres.jpg"
-  },
-  {
-    id: "collar_infinito",
-    nombre: "Collar Infinito",
-    precio: 7500,
-    descripcionCorta: "Collar con dije infinito y cuentas neutras.",
-    descripcionDetallada:
-      "Cuentas en tonos neutros con dije infinito bañado en oro para simbolizar la conexión eterna.",
-    imagen: "../assets/collarcuatro.jpg"
-  }
-];
-
 const inventarioProductos = [];
 
+const URL_CATALOGO = "../json/catalogo.json";
+const RETARDO_CARGA = 300;
+
 const cardProducto = crearCardProducto();
+
+inicializarProductos();
+
+function inicializarProductos() {
+  if (!listaPulseras || !listaCollares) {
+    return;
+  }
+
+  setTimeout(() => {
+    cargarCatalogo()
+      .then((catalogo) => {
+        poblarCatalogo(catalogo);
+        compartirCatalogoConCarrito(catalogo);
+      })
+      .catch((error) => {
+        console.error("No fue posible obtener el catálogo", error);
+        mostrarMensajeDeError();
+      });
+  }, RETARDO_CARGA);
+}
+
+async function cargarCatalogo() {
+  const respuesta = await fetch(URL_CATALOGO, { cache: "no-cache" });
+
+  if (!respuesta.ok) {
+    throw new Error("Respuesta inesperada del servidor: " + respuesta.status);
+  }
+
+  const datos = await respuesta.json();
+  return normalizarCatalogo(datos);
+}
+
+function normalizarCatalogo(datos) {
+  const resultado = {
+    pulseras: Array.isArray(datos?.pulseras) ? datos.pulseras : [],
+    collares: Array.isArray(datos?.collares) ? datos.collares : []
+  };
+
+  return resultado;
+}
+
+function poblarCatalogo(catalogo) {
+  limpiarLista(listaPulseras);
+  limpiarLista(listaCollares);
+  inventarioProductos.length = 0;
+
+  for (let i = 0; i < catalogo.pulseras.length; i++) {
+    crearTarjetaProducto(catalogo.pulseras[i], listaPulseras);
+  }
+
+  for (let j = 0; j < catalogo.collares.length; j++) {
+    crearTarjetaProducto(catalogo.collares[j], listaCollares);
+  }
+}
+
+function limpiarLista(lista) {
+  if (lista) {
+    lista.innerHTML = "";
+  }
+}
+
+function compartirCatalogoConCarrito(catalogo) {
+  const mapa = {};
+
+  for (let i = 0; i < catalogo.pulseras.length; i++) {
+    mapa[catalogo.pulseras[i].id] = catalogo.pulseras[i];
+  }
+
+  for (let j = 0; j < catalogo.collares.length; j++) {
+    mapa[catalogo.collares[j].id] = catalogo.collares[j];
+  }
+
+  window.catalogoDatos = mapa;
+
+  const evento = new CustomEvent("catalogoCargado", {
+    detail: {
+      productos: mapa
+    }
+  });
+
+  document.dispatchEvent(evento);
+}
+
+function mostrarMensajeDeError() {
+  const mensaje = document.createElement("li");
+  mensaje.className = "producto__mensaje-error";
+  mensaje.textContent = "No pudimos cargar los productos. Por favor, recargá la página.";
+
+  if (listaPulseras) {
+    listaPulseras.appendChild(mensaje.cloneNode(true));
+  }
+
+  if (listaCollares) {
+    listaCollares.appendChild(mensaje);
+  }
+}
 
 function crearCardProducto() {
   const overlay = document.createElement("div");
@@ -244,10 +246,10 @@ function crearTarjetaProducto(producto, listaDestino) {
   listaDestino.appendChild(item);
 }
 
-for (let i = 0; i < datosPulseras.length; i++) {
-  crearTarjetaProducto(datosPulseras[i], listaPulseras);
-}
+// for (let i = 0; i < datosPulseras.length; i++) {
+//   crearTarjetaProducto(datosPulseras[i], listaPulseras);
+// }
 
-for (let j = 0; j < datosCollares.length; j++) {
-  crearTarjetaProducto(datosCollares[j], listaCollares);
-}
+// for (let j = 0; j < datosCollares.length; j++) {
+//   crearTarjetaProducto(datosCollares[j], listaCollares);
+// }
